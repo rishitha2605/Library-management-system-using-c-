@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Inventory & Stock Manager</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --success-bg: #dcfce7;
+      --success-text: #166534;
+      --error-bg: #fee2e2;
+      --error-text: #991b1b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 2rem 1rem;
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-size: 1.875rem;
+      color: var(--text);
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .card h2 {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.6rem 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    button {
+      width: 100%;
+      padding: 0.7rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .alert {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      display: none;
+    }
+
+    .alert.success {
+      display: block;
+      background-color: var(--success-bg);
+      color: var(--success-text);
+    }
+
+    .alert.error {
+      display: block;
+      background-color: var(--error-bg);
+      color: var(--error-text);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      background-color: #f1f5f9;
+      font-weight: 600;
+    }
+
+    .full-width {
+      margin-top: 1.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Book Stock & Inventory Manager</h1>
+      <p>Add books to inventory, search by title, and calculate purchase costs.</p>
+    </header>
+
+    <div class="grid">
+      <!-- Add Book Form (Equivalent to stock::input()) -->
+      <div class="card">
+        <h2>1. Add Book to Stock</h2>
+        <form id="addBookForm">
+          <div class="form-group">
+            <label for="title">Book Title</label>
+            <input type="text" id="title" placeholder="e.g., Clean Code" required />
+          </div>
+          <div class="form-group">
+            <label for="author">Author</label>
+            <input type="text" id="author" placeholder="e.g., Robert Martin" required />
+          </div>
+          <div class="form-group">
+            <label for="publisher">Publisher</label>
+            <input type="text" id="publisher" placeholder="e.g., Prentice Hall" required />
+          </div>
+          <div class="form-group">
+            <label for="price">Price (Rs.)</label>
+            <input type="number" id="price" step="0.01" min="0" placeholder="e.g., 450" required />
+          </div>
+          <div class="form-group">
+            <label for="copies">Copies Available</label>
+            <input type="number" id="copies" min="1" placeholder="e.g., 10" required />
+          </div>
+          <button type="submit">Add Book</button>
+        </form>
+      </div>
+
+      <!-- Search & Purchase Form (Equivalent to access_title() & getdata()) -->
+      <div class="card">
+        <h2>2. Search & Order Copies</h2>
+        <form id="searchBookForm">
+          <div class="form-group">
+            <label for="searchTitle">Required Book Title</label>
+            <input type="text" id="searchTitle" placeholder="Enter exact book title" required />
+          </div>
+          <div class="form-group">
+            <label for="reqCopies">Number of Copies</label>
+            <input type="number" id="reqCopies" min="1" placeholder="e.g., 3" required />
+          </div>
+          <button type="submit">Check Availability & Price</button>
+        </form>
+
+        <div id="resultBox" class="alert"></div>
+      </div>
+    </div>
+
+    <!-- Current Stock Table -->
+    <div class="card full-width">
+      <h2>Current Inventory</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Publisher</th>
+            <th>Price (Rs.)</th>
+            <th>Available Copies</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Equivalent to C++ class `stock`
+    class Stock {
+      constructor(title, author, pub, price, numcopies) {
+        this.title = title;
+        this.author = author;
+        this.pub = pub;
+        this.price = parseFloat(price);
+        this.numcopies = parseInt(numcopies, 10);
+      }
+
+      accessTitle(searchTitle) {
+        return this.title.trim().toLowerCase() === searchTitle.trim().toLowerCase();
+      }
+
+      getData(num) {
+        if (this.numcopies >= num) {
+          return {
+            available: true,
+            message: `Cost of ${num} book(s) is Rs. ${(this.price * num).toFixed(2)}`
+          };
+        } else {
+          return {
+            available: false,
+            message: `Sorry! Only ${this.numcopies} copies available.`
+          };
+        }
+      }
+    }
+
+    // Default initial stock (Equivalent to default constructor values + sample data)
+    const inventory = [
+      new Stock("efg", "abc", "hij", 500, 50)
+    ];
+
+    const tableBody = document.getElementById("inventoryTableBody");
+    const resultBox = document.getElementById("resultBox");
+
+    function renderInventory() {
+      tableBody.innerHTML = "";
+      inventory.forEach((book) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${book.title}</td>
+          <td>${book.author}</td>
+          <td>${book.pub}</td>
+          <td>Rs. ${book.price.toFixed(2)}</td>
+          <td>${book.numcopies}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Handle adding a new book
+    document.getElementById("addBookForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("title").value;
+      const author = document.getElementById("author").value;
+      const publisher = document.getElementById("publisher").value;
+      const price = document.getElementById("price").value;
+      const copies = document.getElementById("copies").value;
+
+      inventory.push(new Stock(title, author, publisher, price, copies));
+      renderInventory();
+      e.target.reset();
+    });
+
+    // Handle searching and checking cost
+    document.getElementById("searchBookForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const searchTitle = document.getElementById("searchTitle").value;
+      const reqCopies = parseInt(document.getElementById("reqCopies").value, 10);
+
+      const matchedBook = inventory.find((book) => book.accessTitle(searchTitle));
+
+      if (!matchedBook) {
+        resultBox.className = "alert error";
+        resultBox.textContent = "Book unavailable!";
+        return;
+      }
+
+      const result = matchedBook.getData(reqCopies);
+      resultBox.className = result.available ? "alert success" : "alert error";
+      resultBox.textContent = result.message;
+    });
+
+    // Initial table render
+    renderInventory();
+  </script>
+</body>
+</html>
